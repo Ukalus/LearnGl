@@ -8,9 +8,10 @@ https://learnopengl.com
 ## Depedencies:
 
 Libaries needed 
-- > openGl
-- > glad
-- > glfw
+
+**openGl**
+**glad**
+**glfw**
 
 Opengl itself is just a specification, there is no real "OpenGl Library" that stores specific function definitions. The functions can differ on each graphicscard(newer features, new algorithims, etc.), so **OpenGl** just specifies their rough layout in form of a wrapper library.
 
