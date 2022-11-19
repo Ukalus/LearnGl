@@ -7,14 +7,20 @@
 // TODO what does it do exactly?
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
+void changeRenderTri(float verts[],int vertSize,unsigned int VBO,unsigned int VAO);
 // All hardcoded data
 
 // Raw vertex data 
 
-float vertices[] = {
-    -0.5f,-0.5f,0.0f,
+float Triangle[] = {
+    -0.5f,-0.75f,0.0f,
      0.5f,-0.5f,0.0f,
      0.0f, 0.5f,0.0f
+};
+float Triangle2[] = {
+    -0.2f,-0.3f,0.0f,
+     0.2f,-0.2f,0.0f,
+     0.3f, 0.5f,0.0f
 };
 // Vertex shader pre-compiled
     const char *vertexShaderSource = "#version 330 core\n"
@@ -48,7 +54,7 @@ int main() {
     // important for apple? seems to enable foreward compatibility? not sure what that means
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
     // creating a glfw window object 
-    GLFWwindow* window = glfwCreateWindow(1200, 800, "LearnOpenGL", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1200, 800, "Ukalus", NULL, NULL);
     // check if window could be created. if not: close 
     if (window == NULL)
     {
@@ -68,20 +74,7 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
-    // OpenGl Code 
-
-    // create a glviewport? what is the difference between glViewport and the glfw window?
-    glViewport(0, 0, 800,800);
-    // create vertex buffer object
-    unsigned int VBO;
-    // generate VBO + Id on some sort of memory?
-    glGenBuffers(1,&VBO);
-    // bind VBO to GL_ARRAY_BUFFER
-    glBindBuffer(GL_ARRAY_BUFFER,VBO);
-    // no clue what this does?
-    glBufferData(GL_ARRAY_BUFFER,sizeof(vertices),vertices,GL_STATIC_DRAW);
-
-
+    
     // Shaders
     int success;
     char infoLog[512];
@@ -136,23 +129,34 @@ int main() {
         std::cout << "ERROR::SHADER::SHADER_PROGRAM::COMPILATION_FAILED\n";
         
     }
-    // Use program? how?
-    glUseProgram(shaderProgram);
     // Delete the Shader objects
     glDeleteShader(vertexShader);
     glDeleteShader(fragmentShader);
-    // something to do with the spacing of the raw vertice data?
+
+
+   // i need to understand this step more!
+    unsigned int VBO_triangle, VAO;
+    //changeRenderTri(Triangle,sizeof(Triangle),VBO_triangle,VAO);
+    glGenVertexArrays(1,&VAO);
+    glGenBuffers(1,&VBO_triangle);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER,VBO_triangle);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(Triangle2),Triangle,GL_STATIC_DRAW);
     glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);
-    // honestly no idea but 0 is the id of the object that is being enabled?
     glEnableVertexAttribArray(0);
 
-
-    
+   
+     
   // Update loop in which Input and Bufferswapping happens   
     while(!glfwWindowShouldClose(window))
 {
     // input
     processInput(window);
+
+    glUseProgram(shaderProgram);
+    glBindVertexArray(VAO);
+    glDrawArrays(GL_TRIANGLES,0,3);
+
     // swap buffer
     glfwSwapBuffers(window);
     // dont know?
@@ -176,3 +180,15 @@ void processInput(GLFWwindow *window)
     if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(window, true);
 }  
+//Render Triangle
+
+void changeRenderTri(float verts[],int vertSize,unsigned int VBO,unsigned int VAO)
+{
+    glGenVertexArrays(1,&VAO);
+    glGenBuffers(1,&VBO);
+    glBindVertexArray(VAO);
+    glBindBuffer(GL_ARRAY_BUFFER,VBO);
+    glBufferData(GL_ARRAY_BUFFER,vertSize,verts,GL_STATIC_DRAW);
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);
+    glEnableVertexAttribArray(0);
+}

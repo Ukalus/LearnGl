@@ -10,7 +10,9 @@ https://learnopengl.com
 Libaries needed 
 
 **openGl**
+<br>
 **glad**
+<br>
 **glfw**
 
 Opengl itself is just a specification, there is no real "OpenGl Library" that stores specific function definitions. The functions can differ on each graphicscard(newer features, new algorithims, etc.), so **OpenGl** just specifies their rough layout in form of a wrapper library.
@@ -42,7 +44,7 @@ through alot of trial and error i have found numerous ways on how to **_not_** c
 
 - dont use **gcc** when compiling a .cpp file ;) use **g++** 
 
-this is how you compile command could look:
+this is how your compile command could look:
 
 > g++ ./main.cpp ./glad/src/glad.c -lm -lGL -lglfw3 -o run 
 
