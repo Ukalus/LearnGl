@@ -1,16 +1,16 @@
 #include <iostream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <fstream>
+#include <string>
 
 
-// Function "heads"
-// TODO what does it do exactly?
+
+// Function declaration
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
-void changeRenderTri(float verts[],int vertSize,unsigned int VBO,unsigned int VAO);
-// All hardcoded data
-
-// Raw vertex data 
+void changeRenderTri(float verts[], int vertSize, unsigned int VBO, unsigned int VAO, unsigned int *refVBO, unsigned *refVAO);
+std::string getShader(std::string filepath);
 
 float Triangle[] = {
     -0.5f,-0.75f,0.0f,
@@ -22,25 +22,18 @@ float Triangle2[] = {
      0.2f,-0.2f,0.0f,
      0.3f, 0.5f,0.0f
 };
-// Vertex shader pre-compiled
-    const char *vertexShaderSource = "#version 330 core\n"
-    "layout (location = 0) in vec3 aPos;\n"
-    "void main()\n"
-    "{\n"
-        "gl_Position = vec4(aPos.x,aPos.y,aPos.z,1.0);\n"
-    "}\n"
-    ";\0";
 
- // Fragment Shader pre-compiled
-    const char *fragmentShaderSource = "#version 330 core\n"
-    "out vec4 FragColor;\n"
 
-    "void main()\n"
-    "{\n"
-        "FragColor = vec4(1.0f,0.5f,0.2f,1.0f);\n"
-    "};\0";
 
+ 
 int main() {
+    const char* vertexShaderSource = getShader("shader/vertexShader.ukalus").c_str();
+    const char* fragmentShaderSource = getShader("shader/fragmentShader.ukalus").c_str();
+
+    std::cout << getShader("shader/vertexShader.ukalus").c_str();
+    std::cout << getShader("shader/fragmentShader.ukalus").c_str();
+    std::cout << vertexShaderSource;
+    std::cout << fragmentShaderSource;
 
     // Initialize glfw
     glfwInit();
@@ -85,7 +78,7 @@ int main() {
     // load an unconfigured vertex shader object into it
     vertexShader = glCreateShader(GL_VERTEX_SHADER);
     // load our raw vertex data into the vertexshader object 
-    glShaderSource(vertexShader,1,&vertexShaderSource, NULL);
+    glShaderSource(vertexShader,1, &vertexShaderSource, NULL);
     // compile this vertex shader object
     glCompileShader(vertexShader);
 
@@ -136,7 +129,10 @@ int main() {
 
    // i need to understand this step more!
     unsigned int VBO_triangle, VAO;
-    //changeRenderTri(Triangle,sizeof(Triangle),VBO_triangle,VAO);
+    unsigned int *VBORef,*VAORef;
+    VBORef = &VBO_triangle;
+    VAORef = &VAO; 
+    // changeRenderTri(Triangle,sizeof(Triangle),VBO_triangle,VAO,VBORef,VAORef);
     glGenVertexArrays(1,&VAO);
     glGenBuffers(1,&VBO_triangle);
     glBindVertexArray(VAO);
@@ -182,13 +178,30 @@ void processInput(GLFWwindow *window)
 }  
 //Render Triangle
 
-void changeRenderTri(float verts[],int vertSize,unsigned int VBO,unsigned int VAO)
+// Doesnt work
+void changeRenderTri(float verts[],int vertSize,unsigned int VBO,unsigned int VAO,unsigned int *refVBO,unsigned int *refVAO)
 {
-    glGenVertexArrays(1,&VAO);
-    glGenBuffers(1,&VBO);
+    glGenVertexArrays(1,refVBO);
+    glGenBuffers(1,refVAO);
     glBindVertexArray(VAO);
     glBindBuffer(GL_ARRAY_BUFFER,VBO);
     glBufferData(GL_ARRAY_BUFFER,vertSize,verts,GL_STATIC_DRAW);
     glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);
     glEnableVertexAttribArray(0);
+}
+
+std::string getShader(std::string filepath)
+{
+    std::ifstream shaderFile;
+    std::string shaderString;
+    shaderFile.open(filepath);
+    if(shaderFile.is_open()){
+        std::string line;
+        while(getline(shaderFile,line)){
+            shaderString = shaderString + line + "\n";
+        }
+        shaderFile.close();
+
+    }
+    return shaderString;
 }
