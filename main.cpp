@@ -27,8 +27,10 @@ float Triangle2[] = {
 
  
 int main() {
-    const char* vertexShaderSource = getShader("shader/vertexShader.ukalus").c_str();
-    const char* fragmentShaderSource = getShader("shader/fragmentShader.ukalus").c_str();
+    std::string vertexString = getShader("shader/vertexShader.ukalus");
+    std::string fragmentString = getShader("shader/fragmentShader.ukalus");
+    const char* fragmentShaderSource = fragmentString.c_str();
+    const char* vertexShaderSource = vertexString.c_str() ;
 
     std::cout << getShader("shader/vertexShader.ukalus").c_str();
     std::cout << getShader("shader/fragmentShader.ukalus").c_str();
