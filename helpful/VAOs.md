@@ -13,6 +13,10 @@ First you create a variable to hold the ID
 
 > unsigned int VAO;
 
-Then you Create a Space on your GPUs VRAM like so:
+Then you generate space on your GPUs VRAM and safe the ID of that space like so:
 
-> glGenBuffer(GL_ATTRIBUTE_ARRAY)
+> glGenVertexArray(VAO);
+
+Then you bind configure it like this:
+
+> glVertexAttribPointer(0,3,GL_FLOAT,GL_FLASE, 3* sizeof(float),(void*)0)
