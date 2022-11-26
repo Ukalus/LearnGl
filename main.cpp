@@ -11,10 +11,10 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void changeRenderTri(float verts[], int vertSize, unsigned int VBO, unsigned int VAO, unsigned int *refVBO, unsigned *refVAO);
 std::string getShader(std::string filepath);
-void compileShader(unsigned int &vramShaderLoc,const char* shaderPtr);
+void compileShader(unsigned int &vramShaderLoc,const char* shaderPtr, GLenum shaderType);
 
 float Triangle[] = {
-    -0.5f,-0.75f,0.0f,
+    -0.5f,-0.5f,0.0f,
      0.5f,-0.5f,0.0f,
      0.0f, 0.5f,0.0f
 };
@@ -68,8 +68,8 @@ int main() {
  
     unsigned int vertexShader,fragmentShader;
 
-    compileShader(vertexShader,vertexShaderSource);
-    compileShader(fragmentShader,fragmentShaderSource);
+    compileShader(vertexShader,vertexShaderSource,GL_VERTEX_SHADER);
+    compileShader(fragmentShader,fragmentShaderSource,GL_FRAGMENT_SHADER);
   
 
     int success;
@@ -96,21 +96,21 @@ int main() {
 
 
    // i need to understand this step more!
-    unsigned int VBO_triangle, VAO;
-    unsigned int *VBORef,*VAORef;
-    VBORef = &VBO_triangle;
-    VAORef = &VAO; 
-    // changeRenderTri(Triangle,sizeof(Triangle),VBO_triangle,VAO,VBORef,VAORef);
+    unsigned int VBO, VAO; 
+
     glGenVertexArrays(1,&VAO);
-    glGenBuffers(1,&VBO_triangle);
+    glGenBuffers(1,&VBO);
+
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER,VBO_triangle);
-    glBufferData(GL_ARRAY_BUFFER,sizeof(Triangle2),Triangle,GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER,VBO);
+
     glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);
+    glBufferData(GL_ARRAY_BUFFER,sizeof(Triangle),Triangle,GL_STATIC_DRAW);
+    
+    
+   
     glEnableVertexAttribArray(0);
 
-   
-     
   // Update loop in which Input and Bufferswapping happens   
     while(!glfwWindowShouldClose(window))
 {
@@ -124,7 +124,9 @@ int main() {
     // swap buffer
     glfwSwapBuffers(window);
     // dont know?
-    glfwPollEvents();    
+    glfwPollEvents();  
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 }
 // exit program
 glfwTerminate();
@@ -141,8 +143,9 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height)
 // process input
 void processInput(GLFWwindow *window)
 {
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS){
         glfwSetWindowShouldClose(window, true);
+    }   
 }  
 //Render Triangle
 
@@ -175,8 +178,8 @@ std::string getShader(std::string filepath)
     return shaderString;
 }
 
-void compileShader(unsigned int &vramShaderLoc,const char* shaderPtr){
-    vramShaderLoc = glCreateShader(GL_VERTEX_SHADER);
+void compileShader(unsigned int &vramShaderLoc,const char* shaderPtr, GLenum shaderType ){
+    vramShaderLoc = glCreateShader(shaderType);
     glShaderSource(vramShaderLoc,1, &shaderPtr,NULL);
     glCompileShader(vramShaderLoc);
 
