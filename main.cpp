@@ -11,6 +11,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
 void changeRenderTri(float verts[], int vertSize, unsigned int VBO, unsigned int VAO, unsigned int *refVBO, unsigned *refVAO);
 std::string getShader(std::string filepath);
+void compileShader(unsigned int &vramShaderLoc,const char* shaderPtr);
 
 float Triangle[] = {
     -0.5f,-0.75f,0.0f,
@@ -32,11 +33,6 @@ int main() {
     const char* fragmentShaderSource = fragmentString.c_str();
     const char* vertexShaderSource = vertexString.c_str() ;
 
-    std::cout << getShader("shader/vertexShader.ukalus").c_str();
-    std::cout << getShader("shader/fragmentShader.ukalus").c_str();
-    std::cout << vertexShaderSource;
-    std::cout << fragmentShaderSource;
-
     // Initialize glfw
     glfwInit();
 
@@ -49,7 +45,7 @@ int main() {
     // important for apple? seems to enable foreward compatibility? not sure what that means
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
     // creating a glfw window object 
-    GLFWwindow* window = glfwCreateWindow(1200, 800, "Ukalus", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(1200, 800, "LearnGl", NULL, NULL);
     // check if window could be created. if not: close 
     if (window == NULL)
     {
@@ -69,46 +65,16 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
-    
-    // Shaders
+ 
+    unsigned int vertexShader,fragmentShader;
+
+    compileShader(vertexShader,vertexShaderSource);
+    compileShader(fragmentShader,fragmentShaderSource);
+  
+
     int success;
     char infoLog[512];
-    // Compiling Vertex Shader 
     
-    // create space for vertex shader
-    unsigned int vertexShader;
-    // load an unconfigured vertex shader object into it
-    vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    // load our raw vertex data into the vertexshader object 
-    glShaderSource(vertexShader,1, &vertexShaderSource, NULL);
-    // compile this vertex shader object
-    glCompileShader(vertexShader);
-
-    // load compile status of the vertex shader object into success variable 
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    // check if success is true 
-    if(!success)
-    {
-        glGetShaderInfoLog(vertexShader,512,NULL,infoLog);
-        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n";
-    }
-
-    //Compiling fragment shader 
-    // same as fragment shader
-    unsigned int fragmentShader;
-    fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader,1, &fragmentShaderSource, NULL);
-    glCompileShader(fragmentShader);
-
-    if(!success)
-    {
-        glGetShaderInfoLog(fragmentShader,512,NULL,infoLog);
-        std::cout << "ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n";
-    }
-    
-    //Linking shader object
-
-    //Create shader program
     unsigned int shaderProgram;
     // load empty shader program object into it 
     shaderProgram = glCreateProgram();
@@ -205,5 +171,22 @@ std::string getShader(std::string filepath)
         shaderFile.close();
 
     }
+    std::cout << "### SHADER LOADED ###" << std::endl << shaderString << std::endl;
     return shaderString;
+}
+
+void compileShader(unsigned int &vramShaderLoc,const char* shaderPtr){
+    vramShaderLoc = glCreateShader(GL_VERTEX_SHADER);
+    glShaderSource(vramShaderLoc,1, &shaderPtr,NULL);
+    glCompileShader(vramShaderLoc);
+
+    int success;
+    char infoLog[512];
+    glGetShaderiv(vramShaderLoc, GL_COMPILE_STATUS, &success);
+    // check if success is true 
+    if(!success)
+    {
+        glGetShaderInfoLog(vramShaderLoc,512,NULL,infoLog);
+        std::cout << "ERROR::SHADER::VERTEX::COMPILATION_FAILED\n";
+    }
 }
