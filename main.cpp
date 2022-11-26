@@ -14,14 +14,14 @@ std::string getShader(std::string filepath);
 void compileShader(unsigned int &vramShaderLoc,const char* shaderPtr, GLenum shaderType);
 
 float Triangle[] = {
-    -0.5f,-0.5f,0.0f,
-     0.5f,-0.5f,0.0f,
-     0.0f, 0.5f,0.0f
-};
-float Triangle2[] = {
-    -0.2f,-0.3f,0.0f,
-     0.2f,-0.2f,0.0f,
-     0.3f, 0.5f,0.0f
+ // first triangle
+        -0.9f, -0.5f, 0.0f,  // left 
+        -0.0f, -0.5f, 0.0f,  // right
+        -0.45f, 0.5f, 0.0f,  // top 
+        // second triangle
+         0.0f, -0.5f, 0.0f,  // left
+         0.9f, -0.5f, 0.0f,  // right
+         0.45f, 0.5f, 0.0f   // top 
 };
 
 
@@ -45,7 +45,7 @@ int main() {
     // important for apple? seems to enable foreward compatibility? not sure what that means
     glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT,GL_TRUE);
     // creating a glfw window object 
-    GLFWwindow* window = glfwCreateWindow(1200, 800, "LearnGl", NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(800, 600, "LearnGl", NULL, NULL);
     // check if window could be created. if not: close 
     if (window == NULL)
     {
@@ -97,36 +97,39 @@ int main() {
 
    // i need to understand this step more!
     unsigned int VBO, VAO; 
-
+    
     glGenVertexArrays(1,&VAO);
     glGenBuffers(1,&VBO);
-
+    
     glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER,VBO);
 
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);
+    glBindBuffer(GL_ARRAY_BUFFER,VBO);
     glBufferData(GL_ARRAY_BUFFER,sizeof(Triangle),Triangle,GL_STATIC_DRAW);
+
     
-    
-   
+    glVertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);   
     glEnableVertexAttribArray(0);
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
   // Update loop in which Input and Bufferswapping happens   
     while(!glfwWindowShouldClose(window))
 {
     // input
     processInput(window);
+    
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f );
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
 
     glUseProgram(shaderProgram);
-    glBindVertexArray(VAO);
-    glDrawArrays(GL_TRIANGLES,0,3);
+ 
+    glDrawArrays(GL_TRIANGLES,0,6);
 
     // swap buffer
     glfwSwapBuffers(window);
     // dont know?
     glfwPollEvents();  
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f );
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
+   
 }
 // exit program
 glfwTerminate();
