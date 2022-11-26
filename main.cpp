@@ -107,7 +107,7 @@ int main() {
     glBufferData(GL_ARRAY_BUFFER,sizeof(Triangle),Triangle,GL_STATIC_DRAW);
 
     
-    glVertexAttribPointer(0,4,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);   
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);   
     glEnableVertexAttribArray(0);
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -151,18 +151,6 @@ void processInput(GLFWwindow *window)
     }   
 }  
 //Render Triangle
-
-// Doesnt work
-void changeRenderTri(float verts[],int vertSize,unsigned int VBO,unsigned int VAO,unsigned int *refVBO,unsigned int *refVAO)
-{
-    glGenVertexArrays(1,refVBO);
-    glGenBuffers(1,refVAO);
-    glBindVertexArray(VAO);
-    glBindBuffer(GL_ARRAY_BUFFER,VBO);
-    glBufferData(GL_ARRAY_BUFFER,vertSize,verts,GL_STATIC_DRAW);
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);
-    glEnableVertexAttribArray(0);
-}
 
 std::string getShader(std::string filepath)
 {
