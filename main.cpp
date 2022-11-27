@@ -3,6 +3,7 @@
 #include <GLFW/glfw3.h>
 #include <fstream>
 #include <string>
+#include <cmath>
 
 
 
@@ -15,18 +16,19 @@ void compileShader(unsigned int &vramShaderLoc,const char* shaderPtr, GLenum sha
 void createShaderProgram(unsigned int shaderProgram, unsigned int vertexShader, unsigned int fragmentShader);
 
 float Triangle[] = {
-        -0.9f, -0.5f, 0.0f,  // left 
-        -0.0f, -0.5f, 0.0f,  // right
-        -0.45f, 0.5f, 0.0f,  // top 
-         0.9f, -0.5f, 0.0f,  // right
-         0.45f, 0.5f, 0.0f   // top 
-        -0.45f,-0.5f, 0.0f, 
+        //position           //color
+        -0.9f, -0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
+        -0.0f, -0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
+        -0.45f, 0.5f, 0.0f,  0.0f, 0.0f, 1.0f,
+         0.9f, -0.5f, 0.0f,  0.0f, 0.0f, 0.0f,
+         0.45f, 0.5f, 0.0f,  1.0f, 0.0f, 0.0f
 };
 
 unsigned int indices[] = {
+    0,2,1,
     1,2,4,
     4,1,3,
-    1,2
+  
 };
 
 unsigned int indices2[] = {
@@ -75,6 +77,8 @@ int main() {
     glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
 
+    
+
  
     unsigned int vertexShader,orangeFragmentShader,yellowFragmentShader;
 
@@ -90,10 +94,16 @@ int main() {
     // load empty shader program object into it 
     
     orangeShaderProgram = glCreateProgram();
-    createShaderProgram(orangeShaderProgram,vertexShader,orangeFragmentShader);
     yellowShaderProgram = glCreateProgram();
+
+    createShaderProgram(orangeShaderProgram,vertexShader,orangeFragmentShader);
     createShaderProgram(yellowShaderProgram,vertexShader,yellowFragmentShader);
    // i need to understand this step more!
+
+    // Uniform Code magic 
+
+    
+
     unsigned int VBO[2], VAO[2], EBO[2]; 
     
     glGenVertexArrays(2,VAO);
@@ -117,8 +127,11 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices2),indices2,GL_STATIC_DRAW);
     
 
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,3 * sizeof(float),(void*)0);   
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,6 * sizeof(float),(void*)0);   
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    glEnableVertexAttribArray(1);
 
     
   // Update loop in which Input and Bufferswapping happens   
@@ -129,7 +142,6 @@ int main() {
     
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
-
     glUseProgram(yellowShaderProgram);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO[0]);
     glDrawElements(GL_TRIANGLES,9,GL_UNSIGNED_INT,0);
@@ -161,7 +173,8 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
     } 
     if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS){
-         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE); 
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+          
     } 
      if(glfwGetKey(window, GLFW_KEY_F) == GLFW_PRESS){
          glPolygonMode(GL_FRONT_AND_BACK, GL_FILL); 
