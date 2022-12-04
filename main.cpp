@@ -88,6 +88,9 @@ class UkalusShaderProgram{
     }
 };
 
+class UkalusTexture{
+
+};
 // Function declaration
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -96,14 +99,16 @@ void createShaderProgram(unsigned int shaderProgram, unsigned int vertexShader, 
 
 float Triangle[] = {
         //position           //color
-        -0.0f,  0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
+        -0.45f, 0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
         -0.45f,-0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
          0.45f,-0.5f, 0.0f,  0.0f, 0.0f, 1.0f,
+         0.45f, 0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
 };
 
 
 unsigned int indices[] = {
      0,1,2,
+     0,2,3
 };
 
 
@@ -182,7 +187,7 @@ int main() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
     glUseProgram(ukalusShaderProgram.shaderProgram);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
-    glDrawElements(GL_TRIANGLES,3,GL_UNSIGNED_INT,0);
+    glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
     // swap buffer
     glfwSwapBuffers(window);
     // dont know?
