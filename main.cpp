@@ -5,6 +5,9 @@
 #include <string>
 #include <cmath>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
 class UkalusShader{
     std::string filepath;
     std::string shaderString;
@@ -89,6 +92,25 @@ class UkalusShaderProgram{
 };
 
 class UkalusTexture{
+    int width, height,nrChannels;
+    unsigned int texture;
+    public:
+    UkalusTexture(const char* pathToTexture){
+        unsigned char *data = stbi_load(pathToTexture, &width, &height,&nrChannels,0);
+        glGenTextures(1,&texture);
+        glBindTexture(GL_TEXTURE_2D,texture);
+
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);	
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexImage2D(GL_TEXTURE_2D,0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+        glGenerateMipmap(GL_TEXTURE_2D);
+        stbi_image_free(data);
+    };
+    unsigned int getTex(){
+        return texture;
+    };
 
 };
 // Function declaration
@@ -98,11 +120,11 @@ void changeRenderTri(float verts[], int vertSize, unsigned int VBO, unsigned int
 void createShaderProgram(unsigned int shaderProgram, unsigned int vertexShader, unsigned int fragmentShader);
 
 float Triangle[] = {
-        //position           //color
-        -0.45f, 0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
-        -0.45f,-0.5f, 0.0f,  1.0f, 0.0f, 0.0f,
-         0.45f,-0.5f, 0.0f,  0.0f, 0.0f, 1.0f,
-         0.45f, 0.5f, 0.0f,  0.0f, 1.0f, 0.0f,
+        //position           //color            //Textures
+        -0.45f, 0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  1.0f, 1.0f,
+        -0.45f,-0.5f, 0.0f,  1.0f, 0.0f, 0.0f,  0.0f, 1.0f,
+         0.45f,-0.5f, 0.0f,  0.0f, 0.0f, 1.0f,  0.0f, 0.0f,
+         0.45f, 0.5f, 0.0f,  0.0f, 1.0f, 0.0f,  0.0f, 1.0f
 };
 
 
@@ -154,6 +176,8 @@ int main() {
     UkalusShader ukalusShaderFrag("shader/orange.fragment",GL_FRAGMENT_SHADER);
     
     UkalusShaderProgram ukalusShaderProgram(ukalusShaderVert,ukalusShaderFrag);
+    UkalusTexture ukalusTex("textures/image.png");
+    unsigned int texture = ukalusTex.getTex();
 
     unsigned int VBO, VAO, EBO; 
     
@@ -170,11 +194,14 @@ int main() {
     glBufferData(GL_ELEMENT_ARRAY_BUFFER,sizeof(indices),indices,GL_STATIC_DRAW);
 
     
-    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,6 * sizeof(float),(void*)0);   
+    glVertexAttribPointer(0,3,GL_FLOAT,GL_FALSE,8 * sizeof(float),(void*)0);   
     glEnableVertexAttribArray(0);
 
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3* sizeof(float)));
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3* sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6* sizeof(float)));
+    glEnableVertexAttribArray(2);
 
     
   // Update loop in which Input and Bufferswapping happens   
@@ -186,6 +213,7 @@ int main() {
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f );
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
     glUseProgram(ukalusShaderProgram.shaderProgram);
+    glBindTexture(GL_TEXTURE_2D, texture);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,EBO);
     glDrawElements(GL_TRIANGLES,6,GL_UNSIGNED_INT,0);
     // swap buffer
